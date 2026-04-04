@@ -130,7 +130,8 @@ def create_video():
 
     if not url:
         return jsonify({"error": "URL is required"}), 400
-
+    os.makedirs(VIDEO_FOLDER, exist_ok=True)
+    os.makedirs(FRAME_FOLDER, exist_ok=True)
     # Clean folders
     for f in os.listdir(FRAME_FOLDER):
         os.remove(os.path.join(FRAME_FOLDER, f))
