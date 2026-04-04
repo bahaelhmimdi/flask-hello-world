@@ -6,3 +6,4 @@ pandas
 openpyxl
 selenium
 opencv-python
+webdriver-manager
