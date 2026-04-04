@@ -6,13 +6,20 @@ import os
 import subprocess 
 from selenium import webdriver
 app = Flask(__name__)
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
+driver1 = webdriver.Chrome(
+    service=Service(ChromeDriverManager().install()),
+    options=chrome_options
+)
 @app.route('/')
 def hello_world():
-    os.chdir("static") 
-    driver = webdriver.Chrome()
-    driver.get("http://www.python.org")
-    return driver.page_source
+   # os.chdir("static") 
+    #driver = webdriver.Chrome()
+    driver1.get("http://www.python.org")
+    return driver1.page_source
 
 @app.route('/task/<string:name>')
 def task(name):
