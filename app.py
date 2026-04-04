@@ -194,14 +194,15 @@ def create_video():
     return jsonify({
         "video_url": "/video/output.mp4"
     })
-  return jsonify({
+  except Exception as error:  
+   return jsonify({
         "error": str(traceback.format_exc())
     })
 
 @app.route('/video/<filename>')
 def serve_video(filename):
     return send_from_directory(VIDEO_FOLDER, filename)
-  except Exception as error:
+ 
 
 
 
