@@ -7,3 +7,4 @@ openpyxl
 selenium
 opencv-python
 webdriver-manager
+playwright
