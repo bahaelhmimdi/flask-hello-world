@@ -15,7 +15,7 @@ from selenium.webdriver.chrome.options import Options
 import requests
 from bs4 import BeautifulSoup
 
-WEBHOOK_URL = "https://cloud.activepieces.com/api/v1/webhooks/h40XOlvtPd8efwh4fKpzw/test"
+WEBHOOK_URL = "https://cloud.activepieces.com/api/v1/webhooks/h40XOlvtPd8efwh4fKpzw/"
 
 # Example HTML input
 worker_code = """
