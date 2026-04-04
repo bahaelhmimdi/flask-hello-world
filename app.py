@@ -206,6 +206,4 @@ def serve_video(filename):
 
 
 
-@app.route('/video/<filename>')
-def serve_video(filename):
-    return send_from_directory(VIDEO_FOLDER, filename)
+
