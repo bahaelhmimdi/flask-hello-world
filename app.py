@@ -136,7 +136,7 @@ os.makedirs(FRAME_FOLDER, exist_ok=True)
 import traceback
 @app.route('/create-video', methods=['POST'])
 def create_video():
-  try    
+  try:    
     data = request.get_json()
     url = data.get("url")
 
