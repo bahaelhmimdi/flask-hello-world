@@ -371,7 +371,7 @@ from threading import Thread
 
 
 @app.route("/starting")
-def start():
+def starting():
     Thread(target=hello_world).start()
     return "Started"
 
