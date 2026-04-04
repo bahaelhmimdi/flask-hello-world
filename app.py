@@ -183,8 +183,8 @@ def create_video():
     return jsonify({
         "video_url": f"/video/output.mp4"
     })
-except Exception as error:
-  return jsonify({
+  except Exception as error:
+   return jsonify({
         "error": str(traceback.format_exc())
     })
 
