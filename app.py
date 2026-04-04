@@ -122,51 +122,62 @@ os.makedirs(FRAME_FOLDER, exist_ok=True)
 
 import traceback
 
+from flask import request, jsonify, send_from_directory
+from playwright.sync_api import sync_playwright
+import cv2
+import os
+
+VIDEO_FOLDER = "videos"
+FRAME_FOLDER = "frames"
+
+os.makedirs(VIDEO_FOLDER, exist_ok=True)
+os.makedirs(FRAME_FOLDER, exist_ok=True)
+
+import traceback
 @app.route('/create-video', methods=['POST'])
 def create_video():
-  try:  
+  try    
     data = request.get_json()
     url = data.get("url")
 
     if not url:
-        return jsonify({"error": "URL is required"}), 400
-    os.makedirs(VIDEO_FOLDER, exist_ok=True)
-    os.makedirs(FRAME_FOLDER, exist_ok=True)
-    # Clean folders
+        return jsonify({"error": "URL required"}), 400
+
+    # Clean frames
     for f in os.listdir(FRAME_FOLDER):
         os.remove(os.path.join(FRAME_FOLDER, f))
 
-    driver = webdriver.Chrome()
-    driver.set_window_size(1280, 2000)
-    driver.get(url)
-
-    time.sleep(3)
-
-    total_height = driver.execute_script("return document.body.scrollHeight")
-    scroll_step = 300
     frames = []
 
-    current = 0
-    frame_count = 0
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page(viewport={"width": 1280, "height": 2000})
 
-    while current < total_height:
-        driver.execute_script(f"window.scrollTo(0, {current});")
-        time.sleep(0.2)
+        page.goto(url, timeout=60000)
+        page.wait_for_timeout(3000)
 
-        path = os.path.join(FRAME_FOLDER, f"frame_{frame_count}.png")
-        driver.save_screenshot(path)
-        frames.append(path)
+        total_height = page.evaluate("document.body.scrollHeight")
 
-        current += scroll_step
-        frame_count += 1
+        step = 300
+        frame_id = 0
 
-    driver.quit()
+        for y in range(0, total_height, step):
+            page.evaluate(f"window.scrollTo(0, {y})")
+            page.wait_for_timeout(200)
+
+            path = os.path.join(FRAME_FOLDER, f"frame_{frame_id}.png")
+            page.screenshot(path=path)
+            frames.append(path)
+
+            frame_id += 1
+
+        browser.close()
 
     # Create video
     video_path = os.path.join(VIDEO_FOLDER, "output.mp4")
 
-    first_frame = cv2.imread(frames[0])
-    height, width, _ = first_frame.shape
+    first = cv2.imread(frames[0])
+    height, width, _ = first.shape
 
     out = cv2.VideoWriter(
         video_path,
@@ -175,19 +186,23 @@ def create_video():
         (width, height)
     )
 
-    for frame in frames:
-        img = cv2.imread(frame)
+    for f in frames:
+        img = cv2.imread(f)
         out.write(img)
 
     out.release()
-
     return jsonify({
-        "video_url": f"/video/output.mp4"
+        "video_url": "/video/output.mp4"
     })
-  except Exception as error:
-   return jsonify({
+  return jsonify({
         "error": str(traceback.format_exc())
     })
+
+@app.route('/video/<filename>')
+def serve_video(filename):
+    return send_from_directory(VIDEO_FOLDER, filename)
+  except Exception as error:
+
 
 
 @app.route('/video/<filename>')
