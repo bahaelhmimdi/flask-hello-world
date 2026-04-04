@@ -8,3 +8,4 @@ selenium
 opencv-python
 webdriver-manager
 playwright
+beautifulsoup4
