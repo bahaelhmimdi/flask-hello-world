@@ -14,10 +14,10 @@ from selenium.webdriver.chrome.options import Options
 
 @app.route('/')
 def hello_world():
-    os.chdir("static") 
+  #  os.chdir("static") 
     print(os.getcwd())
-    os.chdir("static") 
-    print(os.getcwd())
+ #   os.chdir("static") 
+ #   print(os.getcwd())
     chrome_options = Options()
     chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
