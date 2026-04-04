@@ -5,3 +5,4 @@ wget
 pandas
 openpyxl
 selenium
+opencv-python
