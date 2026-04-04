@@ -120,9 +120,11 @@ FRAME_FOLDER = "frames"
 os.makedirs(VIDEO_FOLDER, exist_ok=True)
 os.makedirs(FRAME_FOLDER, exist_ok=True)
 
+import traceback
 
 @app.route('/create-video', methods=['POST'])
 def create_video():
+  try:  
     data = request.get_json()
     url = data.get("url")
 
@@ -180,6 +182,10 @@ def create_video():
 
     return jsonify({
         "video_url": f"/video/output.mp4"
+    })
+except Exception as error:
+  return jsonify({
+        "error": str(traceback.format_exc())
     })
 
 
