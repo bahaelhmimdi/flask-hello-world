@@ -37,25 +37,30 @@ if os.path.exists(driver_path):
     os.chmod(driver_path, 0o755)
 print(os.getcwd(),os.listdir())
 print("✅ Done! ChromeDriver ready.")
-
+import traceback
 @app.route('/')
 def hello_world():
+      
+
+    try:
+        chrome_options = Options()
+        chrome_options.add_argument("--headless=new")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--window-size=1280,2000")
+        driver1 = webdriver.Chrome(service=Service(), options=chrome_options)
+        driver1.get("https://www.python.org")
+        return driver1.page_source
+    except :
+        return str(traceback.print_exc())  # 🔥 VERY IMPORTANT
   #  os.chdir("static") 
-    print(os.getcwd(),os.listdir())
+   # print(os.getcwd(),os.listdir())
  #   os.chdir("static") 
  #   print(os.getcwd())
-    chrome_options = Options()
-    chrome_options.add_argument("--headless=new")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--window-size=1280,2000")
-    driver1 = webdriver.Chrome(
-    service=Service(),
-    options=chrome_options
-)
-    driver1.get("http://www.python.org")
-    return driver1.page_source
+
+
+    
 
 @app.route('/task/<string:name>')
 def task(name):
