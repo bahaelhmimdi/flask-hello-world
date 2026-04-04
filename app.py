@@ -12,6 +12,37 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from selenium.webdriver.chrome.options import Options
 
+import requests
+from bs4 import BeautifulSoup
+
+WEBHOOK_URL = "https://cloud.activepieces.com/api/v1/webhooks/h40XOlvtPd8efwh4fKpzw/test"
+
+# Example HTML input
+worker_code = """
+<!DOCTYPE html>
+<html>
+<head><title>Test</title></head>
+<body>
+    <h1>Hello World</h1>
+    <p>This is a simple HTML test.</p>
+</body>
+</html>
+"""
+
+def extract_h1_and_body(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Extract H1
+    h1_tag = soup.find("h1")
+    h1_text = h1_tag.get_text(strip=True) if h1_tag else None
+
+    # Extract body HTML
+    body_tag = soup.find("body")
+    body_html = body_tag.decode_contents() if body_tag else ""
+
+    return h1_text, body_html
+
+# Extract data
 
 import zipfile
 import os
@@ -38,7 +69,7 @@ if os.path.exists(driver_path):
 print(os.getcwd(),os.listdir())
 print("✅ Done! ChromeDriver ready.")
 import traceback
-@app.route('/')
+
 def hello_world():
       
 
@@ -51,7 +82,19 @@ def hello_world():
         chrome_options.add_argument("--window-size=1280,2000")
         driver1 = webdriver.Chrome(service=Service(), options=chrome_options)
         driver1.get("https://www.python.org")
-        return driver1.page_source
+        h1_text, body_html = extract_h1_and_body(worker_code)
+
+# Send to webhook
+        data = {
+    "text1": "test",
+    "text2": driver1.page_source   # <-- real HTML here
+         }
+
+         response = requests.post(WEBHOOK_URL, json=data)
+
+         print("Status:", response.status_code)
+         print("Response:", response.text)
+         return driver1.page_source
     except :
         return str(traceback.print_exc())  # 🔥 VERY IMPORTANT
   #  os.chdir("static") 
@@ -322,5 +365,12 @@ def create_video1():
         "error": str(traceback.format_exc())
     })
 
+from threading import Thread
 
+
+
+@app.route("/start")
+def start():
+    Thread(target=hello_world).start()
+    return "Started"
 
