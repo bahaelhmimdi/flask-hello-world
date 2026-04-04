@@ -11,23 +11,23 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 from selenium.webdriver.chrome.options import Options
-print(os.getcwd())
-os.chdir("static") 
-print(os.getcwd())
-chrome_options = Options()
-chrome_options.add_argument("--headless=new")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--window-size=1280,2000")
-driver1 = webdriver.Chrome(
+
+@app.route('/')
+def hello_world():
+    os.chdir("static") 
+    print(os.getcwd())
+    os.chdir("static") 
+    print(os.getcwd())
+    chrome_options = Options()
+    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1280,2000")
+    driver1 = webdriver.Chrome(
     service=Service(ChromeDriverManager().install()),
     options=chrome_options
 )
-@app.route('/')
-def hello_world():
-   # os.chdir("static") 
-    #driver = webdriver.Chrome()
     driver1.get("http://www.python.org")
     return driver1.page_source
 
