@@ -297,7 +297,7 @@ def create_video():
 def serve_video(filename):
     return send_from_directory(VIDEO_FOLDER, filename)
  
-@app.route('/create-video1', methods=['POST'])
+
 def create_video1():
   os.makedirs(VIDEO_FOLDER, exist_ok=True)
   os.makedirs(FRAME_FOLDER, exist_ok=True)  
@@ -313,6 +313,13 @@ def create_video1():
         os.remove(os.path.join(FRAME_FOLDER, f))
 
     driver = webdriver.Chrome()
+    chrome_options = Options()
+    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1280,2000")
+    driver = webdriver.Chrome(service=Service(), options=chrome_options)
     driver.set_window_size(1280, 2000)
     driver.get(url)
 
@@ -336,7 +343,7 @@ def create_video1():
         current += scroll_step
         frame_count += 1
 
-    driver.quit()
+    
 
     # Create video
     video_path = os.path.join(VIDEO_FOLDER, "output.mp4")
@@ -356,9 +363,15 @@ def create_video1():
         out.write(img)
 
     out.release()
+    data = {
+    "text1": "https://bahaedev.onrender.com/video/output.mp4",
+    "text2": driver.page_source   # <-- real HTML here
+         }
 
+    response = requests.post(WEBHOOK_URL, json=data)
+    driver.quit()
     return jsonify({
-        "video_url": f"/video/output.mp4"
+        "video_url": f"https://bahaedev.onrender.com/video/output.mp4"
     })
 
   except Exception as error:  
