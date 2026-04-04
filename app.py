@@ -152,7 +152,7 @@ def create_video():
     frames = []
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.firefox.launch(headless=True)
         page = browser.new_page(viewport={"width": 1280, "height": 2000})
 
         page.goto(url, timeout=60000)
