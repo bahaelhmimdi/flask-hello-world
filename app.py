@@ -51,7 +51,7 @@ def hello_world():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1280,2000")
     driver1 = webdriver.Chrome(
-    service=Service(ChromeDriverManager().install()),
+    service=Service(),
     options=chrome_options
 )
     driver1.get("http://www.python.org")
