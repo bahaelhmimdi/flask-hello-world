@@ -96,6 +96,7 @@ def hello_world():
         print("Response:", response.text)
         return driver1.page_source
     except :
+        print(traceback.print_exc())
         return str(traceback.print_exc())  # 🔥 VERY IMPORTANT
   #  os.chdir("static") 
    # print(os.getcwd(),os.listdir())
