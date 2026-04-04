@@ -12,10 +12,36 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from selenium.webdriver.chrome.options import Options
 
+
+import zipfile
+import os
+print(os.getcwd(),os.listdir())
+url = "https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip"
+zip_path = "chromedriver.zip"
+extract_dir = "chromedriver"
+
+# Download using wget library
+print("⬇️ Downloading...")
+wget.download(url, zip_path)
+
+# Extract zip
+print("\n📦 Extracting...")
+os.makedirs(extract_dir, exist_ok=True)
+
+with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+    zip_ref.extractall(extract_dir)
+
+# Give execution permission (Linux/Mac)
+driver_path = os.path.join(extract_dir, "chromedriver")
+if os.path.exists(driver_path):
+    os.chmod(driver_path, 0o755)
+print(os.getcwd(),os.listdir())
+print("✅ Done! ChromeDriver ready.")
+
 @app.route('/')
 def hello_world():
   #  os.chdir("static") 
-    print(os.getcwd())
+    print(os.getcwd(),os.listdir())
  #   os.chdir("static") 
  #   print(os.getcwd())
     chrome_options = Options()
