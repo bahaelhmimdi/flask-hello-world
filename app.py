@@ -110,3 +110,79 @@ def check():
                 print("++++",lis)
      erros.append(lis)
     return "done"
+from flask import request, jsonify, send_from_directory
+import cv2
+import time
+
+VIDEO_FOLDER = "videos"
+FRAME_FOLDER = "frames"
+
+os.makedirs(VIDEO_FOLDER, exist_ok=True)
+os.makedirs(FRAME_FOLDER, exist_ok=True)
+
+
+@app.route('/create-video', methods=['POST'])
+def create_video():
+    data = request.get_json()
+    url = data.get("url")
+
+    if not url:
+        return jsonify({"error": "URL is required"}), 400
+
+    # Clean folders
+    for f in os.listdir(FRAME_FOLDER):
+        os.remove(os.path.join(FRAME_FOLDER, f))
+
+    driver = webdriver.Chrome()
+    driver.set_window_size(1280, 2000)
+    driver.get(url)
+
+    time.sleep(3)
+
+    total_height = driver.execute_script("return document.body.scrollHeight")
+    scroll_step = 300
+    frames = []
+
+    current = 0
+    frame_count = 0
+
+    while current < total_height:
+        driver.execute_script(f"window.scrollTo(0, {current});")
+        time.sleep(0.2)
+
+        path = os.path.join(FRAME_FOLDER, f"frame_{frame_count}.png")
+        driver.save_screenshot(path)
+        frames.append(path)
+
+        current += scroll_step
+        frame_count += 1
+
+    driver.quit()
+
+    # Create video
+    video_path = os.path.join(VIDEO_FOLDER, "output.mp4")
+
+    first_frame = cv2.imread(frames[0])
+    height, width, _ = first_frame.shape
+
+    out = cv2.VideoWriter(
+        video_path,
+        cv2.VideoWriter_fourcc(*'mp4v'),
+        10,
+        (width, height)
+    )
+
+    for frame in frames:
+        img = cv2.imread(frame)
+        out.write(img)
+
+    out.release()
+
+    return jsonify({
+        "video_url": f"/video/output.mp4"
+    })
+
+
+@app.route('/video/<filename>')
+def serve_video(filename):
+    return send_from_directory(VIDEO_FOLDER, filename)
