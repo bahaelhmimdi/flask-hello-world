@@ -14,7 +14,12 @@ from selenium.webdriver.chrome.options import Options
 
 import requests
 from bs4 import BeautifulSoup
+import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] [%(threadName)s] %(message)s",
+)
 WEBHOOK_URL = "https://cloud.activepieces.com/api/v1/webhooks/h40XOlvtPd8efwh4fKpzw/"
 
 # Example HTML input
@@ -299,85 +304,127 @@ def serve_video(filename):
  
 
 def create_video1():
-  os.makedirs(VIDEO_FOLDER, exist_ok=True)
-  os.makedirs(FRAME_FOLDER, exist_ok=True)  
-  try:      
-    data = request.get_json()
-    url = data.get("url")
+    import traceback
+    import time
+    import uuid
 
-    if not url:
-        return jsonify({"error": "URL is required"}), 400
+    task_id = str(uuid.uuid4())[:8]  # short ID for tracking logs
+    logging.info(f"[{task_id}] Request received")
 
-    # Clean folders
-    for f in os.listdir(FRAME_FOLDER):
-        os.remove(os.path.join(FRAME_FOLDER, f))
+    os.makedirs(VIDEO_FOLDER, exist_ok=True)
+    os.makedirs(FRAME_FOLDER, exist_ok=True)
 
-    driver = webdriver.Chrome()
-    chrome_options = Options()
-    chrome_options.add_argument("--headless=new")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--window-size=1280,2000")
-    driver = webdriver.Chrome(service=Service(), options=chrome_options)
-    driver.set_window_size(1280, 2000)
-    driver.get(url)
+    try:
+        data = request.get_json()
+        logging.info(f"[{task_id}] JSON received: {data}")
 
-    time.sleep(3)
+        url = data.get("url")
 
-    total_height = driver.execute_script("return document.body.scrollHeight")
-    scroll_step = 300
-    frames = []
+        if not url:
+            logging.warning(f"[{task_id}] Missing URL")
+            return jsonify({"error": "URL is required"}), 400
 
-    current = 0
-    frame_count = 0
+        logging.info(f"[{task_id}] Processing URL: {url}")
 
-    while current < total_height:
-        driver.execute_script(f"window.scrollTo(0, {current});")
-        time.sleep(0.2)
+        # Clean folders
+        logging.info(f"[{task_id}] Cleaning frame folder")
+        for f in os.listdir(FRAME_FOLDER):
+            os.remove(os.path.join(FRAME_FOLDER, f))
 
-        path = os.path.join(FRAME_FOLDER, f"frame_{frame_count}.png")
-        driver.save_screenshot(path)
-        frames.append(path)
+        # Setup browser
+        logging.info(f"[{task_id}] Starting Chrome")
 
-        current += scroll_step
-        frame_count += 1
+        chrome_options = Options()
+        chrome_options.add_argument("--headless=new")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--window-size=1280,2000")
 
-    
+        driver = webdriver.Chrome(service=Service(), options=chrome_options)
+        driver.set_window_size(1280, 2000)
 
-    # Create video
-    video_path = os.path.join(VIDEO_FOLDER, "output.mp4")
+        logging.info(f"[{task_id}] Opening page")
+        driver.get(url)
 
-    first_frame = cv2.imread(frames[0])
-    height, width, _ = first_frame.shape
+        time.sleep(3)
 
-    out = cv2.VideoWriter(
-        video_path,
-        cv2.VideoWriter_fourcc(*'mp4v'),
-        10,
-        (width, height)
-    )
+        total_height = driver.execute_script("return document.body.scrollHeight")
+        logging.info(f"[{task_id}] Page height: {total_height}")
 
-    for frame in frames:
-        img = cv2.imread(frame)
-        out.write(img)
+        scroll_step = 300
+        frames = []
 
-    out.release()
-    data = {
-    "text1": "https://bahaedev.onrender.com/video/output.mp4",
-    "text2": driver.page_source   # <-- real HTML here
-         }
+        current = 0
+        frame_count = 0
 
-    response = requests.post(WEBHOOK_URL, json=data)
-    driver.quit()
-    return jsonify({
-        "video_url": f"https://bahaedev.onrender.com/video/output.mp4"
-    })
+        logging.info(f"[{task_id}] Starting scrolling & screenshots")
 
-  except Exception as error:  
-   return jsonify({
-        "error": str(traceback.format_exc())
-    })
+        while current < total_height:
+            driver.execute_script(f"window.scrollTo(0, {current});")
+            time.sleep(0.2)
+
+            path = os.path.join(FRAME_FOLDER, f"frame_{frame_count}.png")
+            driver.save_screenshot(path)
+            frames.append(path)
+
+            if frame_count % 10 == 0:
+                logging.info(f"[{task_id}] Captured frame {frame_count}")
+
+            current += scroll_step
+            frame_count += 1
+
+        logging.info(f"[{task_id}] Total frames: {len(frames)}")
+
+        # Create video
+        video_path = os.path.join(VIDEO_FOLDER, "output.mp4")
+        logging.info(f"[{task_id}] Creating video: {video_path}")
+
+        first_frame = cv2.imread(frames[0])
+        height, width, _ = first_frame.shape
+
+        out = cv2.VideoWriter(
+            video_path,
+            cv2.VideoWriter_fourcc(*'mp4v'),
+            10,
+            (width, height)
+        )
+
+        for i, frame in enumerate(frames):
+            img = cv2.imread(frame)
+            out.write(img)
+
+            if i % 10 == 0:
+                logging.info(f"[{task_id}] Writing frame {i}")
+
+        out.release()
+        logging.info(f"[{task_id}] Video created successfully")
+
+        # Send webhook
+        logging.info(f"[{task_id}] Sending webhook")
+
+        data = {
+            "text1": "https://bahaedev.onrender.com/video/output.mp4",
+            "text2": driver.page_source
+        }
+
+        response = requests.post(WEBHOOK_URL, json=data)
+        logging.info(f"[{task_id}] Webhook status: {response.status_code}")
+
+        driver.quit()
+        logging.info(f"[{task_id}] Browser closed")
+
+        return jsonify({
+            "video_url": "https://bahaedev.onrender.com/video/output.mp4"
+        })
+
+    except Exception:
+        error = traceback.format_exc()
+        logging.error(f"[{task_id}] ERROR:\n{error}")
+
+        return jsonify({
+            "error": error
+        })
 
 from threading import Thread
 
