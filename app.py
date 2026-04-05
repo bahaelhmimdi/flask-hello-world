@@ -381,7 +381,7 @@ def create_video1():
         out = cv2.VideoWriter(
             video_path,
             cv2.VideoWriter_fourcc(*'mp4v'),
-            10,
+            30,
             (width, height)
         )
 
