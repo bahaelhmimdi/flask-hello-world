@@ -359,9 +359,10 @@ def create_video1(url):
             time.sleep(0.2)
 
             path = os.path.join(FRAME_FOLDER, f"frame_{frame_count}.png")
-            driver.save_screenshot(path)
-            frames.append(path)
-
+            for j in range(10):
+             driver.save_screenshot(str(j)+path)
+             frames.append(path)
+             time.sleep(0.2)
             if frame_count % 10 == 0:
                 logging.info(f"[{task_id}] Captured frame {frame_count}")
 
