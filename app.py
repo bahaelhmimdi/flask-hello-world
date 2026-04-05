@@ -422,7 +422,7 @@ from threading import Thread
 
 @app.route("/starting", methods=["POST"])
 def starting():
-    data = request.get_json()
+    data = request.get("body")
 
     if not data or "url" not in data:
         return jsonify({"error": "Missing 'url'"}), 400
