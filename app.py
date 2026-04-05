@@ -333,7 +333,6 @@ def create_video1():
         chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=600, 1024")
 
         driver = webdriver.Chrome(service=Service(), options=chrome_options)
