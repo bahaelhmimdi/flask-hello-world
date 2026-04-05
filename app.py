@@ -430,4 +430,5 @@ def starting():
     url = data["url"]
 
     Thread(target=create_video1, args=(url,)).start()
+    return {"result":"done"},200
 
