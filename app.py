@@ -407,11 +407,9 @@ def create_video1():
         logging.info(f"[{task_id}] Webhook status: {response.status_code}")
 
         driver.quit()
-        logging.info(f"[{task_id}] Browser closed")
+        logging.info(f"[{task_id}] Browser closed get your file from https://bahaedev.onrender.com/video/output.mp4")
 
-        return jsonify({
-            "video_url": "https://bahaedev.onrender.com/video/output.mp4"
-        })
+  
 
     except Exception:
         error = traceback.format_exc()
