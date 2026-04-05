@@ -432,6 +432,6 @@ from threading import Thread
 
 @app.route("/starting")
 def starting():
-    Thread(target=hello_world).start()
+    Thread(target=create_video1).start()
     return "Started"
 
