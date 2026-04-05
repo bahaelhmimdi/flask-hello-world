@@ -299,7 +299,7 @@ def serve_video(filename):
     return send_from_directory(VIDEO_FOLDER, filename)
  
 
-def create_video1():
+def create_video1(url):
     import traceback
     import time
     import uuid
@@ -313,7 +313,7 @@ def create_video1():
     try:
     
 
-        url = "https://hubspot.bahaedev.com/blog/lart_de_la_conversion_avec_bahaedev"
+        
 
         if not url:
             logging.warning(f"[{task_id}] Missing URL")
@@ -420,8 +420,14 @@ from threading import Thread
 
 
 
-@app.route("/starting")
+@app.route("/starting", methods=["POST"])
 def starting():
-    Thread(target=create_video1).start()
-    return "Started"
+    data = request.get_json()
+
+    if not data or "url" not in data:
+        return jsonify({"error": "Missing 'url'"}), 400
+
+    url = data["url"]
+
+    Thread(target=create_video1, args=(url,)).start()
 
