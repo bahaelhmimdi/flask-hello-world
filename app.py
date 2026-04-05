@@ -337,7 +337,7 @@ def create_video1():
         chrome_options.add_argument("--window-size=1024, 600")
 
         driver = webdriver.Chrome(service=Service(), options=chrome_options)
-        driver.set_window_size(1024, 600)
+        driver.set_window_size(600, 1024)
 
         logging.info(f"[{task_id}] Opening page")
         driver.get(url)
