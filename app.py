@@ -315,10 +315,10 @@ def create_video1():
     os.makedirs(FRAME_FOLDER, exist_ok=True)
 
     try:
-        data = request.get_json()
+    
         logging.info(f"[{task_id}] JSON received: {data}")
 
-        url = data.get("url")
+        url = "https://hubspot.bahaedev.com/blog/lart_de_la_conversion_avec_bahaedev"
 
         if not url:
             logging.warning(f"[{task_id}] Missing URL")
