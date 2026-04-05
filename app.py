@@ -316,7 +316,6 @@ def create_video1():
 
     try:
     
-        logging.info(f"[{task_id}] JSON received: {data}")
 
         url = "https://hubspot.bahaedev.com/blog/lart_de_la_conversion_avec_bahaedev"
 
