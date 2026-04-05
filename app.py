@@ -415,9 +415,7 @@ def create_video1():
         error = traceback.format_exc()
         logging.error(f"[{task_id}] ERROR:\n{error}")
 
-        return jsonify({
-            "error": error
-        })
+   
 
 from threading import Thread
 
