@@ -333,10 +333,10 @@ def create_video1(url):
         chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--window-size=720, 1280")
+        chrome_options.add_argument("--window-size=1280, 700")
 
         driver = webdriver.Chrome(service=Service(), options=chrome_options)
-        driver.set_window_size(720 , 1280)
+        driver.set_window_size(1280 , 700)
 
         logging.info(f"[{task_id}] Opening page")
         driver.get(url)
