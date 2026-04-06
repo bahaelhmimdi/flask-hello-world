@@ -359,7 +359,7 @@ def create_video1(url):
             time.sleep(0.2)
 
             
-            for j in range(100):
+            for j in range(10):
              path = os.path.join(FRAME_FOLDER, str(j)+f"frame_{frame_count}.png")   
              driver.save_screenshot(path)
              frames.append(path)
