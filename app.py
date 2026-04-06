@@ -370,7 +370,7 @@ def create_video1(url):
             current += scroll_step
             frame_count += 1
 
-        logging.info(f"[{task_id}] Total frames: {len(frames)}")
+        logging.info(f"[{task_id}] Total frames: {len(frames)}") 
 
         # Create video
         video_path = os.path.join(VIDEO_FOLDER, "output.mp4")
